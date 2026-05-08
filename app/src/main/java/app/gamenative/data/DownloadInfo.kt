@@ -33,6 +33,7 @@ data class DownloadInfo(
     private var hasEmaSpeed: Boolean = false
     private var isActive: Boolean = true
     private val statusMessage = MutableStateFlow<String?>(null)
+    private val downloadLog = MutableStateFlow<List<String>>(emptyList())
     private val postInstallSyncing = MutableStateFlow(false)
 
     fun cancel() {
@@ -141,6 +142,19 @@ data class DownloadInfo(
     }
 
     fun getStatusMessageFlow(): StateFlow<String?> = statusMessage
+
+    fun appendLog(message: String) {
+        val timestamp = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
+        downloadLog.value = downloadLog.value + "[$timestamp] $message"
+        // Keep last 500 entries to avoid memory issues
+        if (downloadLog.value.size > 500) {
+            downloadLog.value = downloadLog.value.takeLast(500)
+        }
+        // Also update the single status message for backward compatibility
+        statusMessage.value = message
+    }
+
+    fun getDownloadLogFlow(): StateFlow<List<String>> = downloadLog
 
     fun setPostInstallSyncing(syncing: Boolean) {
         postInstallSyncing.value = syncing

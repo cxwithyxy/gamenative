@@ -147,6 +147,7 @@
     <!--Winlator-->
     <string name="disabled">Disabled</string>
     <string name="copy">Copy</string>
+    <string name="clear">Clear</string>
     <string name="stability">Stability</string>
     <string name="compatibility">Compatibility</string>
     <string name="intermediate">Intermediate</string>
@@ -567,6 +568,7 @@
     <string name="downloading">Downloading...</string>
     <string name="calculating_time">Calculating...</string>
     <string name="download_failed_try_again">Download failed. Please try again.</string>
+    <string name="download_log_title">Download Log</string>
     <string name="update_available">Update Available</string>
     <string name="game_information">Game Information</string>
     <string name="status">Status</string>

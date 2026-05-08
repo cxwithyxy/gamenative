@@ -181,6 +181,7 @@
     <!-- Winlator -->
     <string name="disabled">已禁用</string>
     <string name="copy">复制</string>
+    <string name="clear">清空</string>
     <string name="stability">稳定</string>
     <string name="compatibility">兼容性</string>
     <string name="intermediate">平衡</string>
@@ -543,6 +544,7 @@
     <string name="downloading">下载中...</string>
     <string name="calculating_time">计算中...</string>
     <string name="download_failed_try_again">下载失败，请重试</string>
+    <string name="download_log_title">下载日志</string>
     <string name="update_available">有可用更新</string>
     <string name="game_information">游戏信息</string>
     <string name="status">状态</string>

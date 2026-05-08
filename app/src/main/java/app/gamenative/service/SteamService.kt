@@ -49,6 +49,7 @@ import app.gamenative.enums.SaveLocation
 import app.gamenative.enums.SyncResult
 import app.gamenative.events.AndroidEvent
 import app.gamenative.events.SteamEvent
+import app.gamenative.utils.DownloadLogger
 import app.gamenative.utils.CaseInsensitiveFileSystem
 import app.gamenative.utils.ContainerUtils
 import app.gamenative.utils.FileUtils
@@ -116,8 +117,6 @@ import `in`.dragonbra.javasteam.types.FileData
 import `in`.dragonbra.javasteam.types.KeyValue
 import `in`.dragonbra.javasteam.types.PublishedFileID
 import `in`.dragonbra.javasteam.types.SteamID
-import `in`.dragonbra.javasteam.util.log.LogListener
-import `in`.dragonbra.javasteam.util.log.LogManager
 import java.io.Closeable
 import java.io.File
 import java.io.IOException
@@ -184,7 +183,7 @@ import java.nio.ByteOrder
 class SteamService : Service(), IChallengeUrlChanged {
 
     // To view log messages in android logcat properly
-    private val logger = object : LogListener {
+    private val logger = object : `in`.dragonbra.javasteam.util.log.LogListener {
         override fun onLog(clazz: Class<*>, message: String?, throwable: Throwable?) {
             val logMessage = message ?: "No message given"
             Timber.i(throwable, "[${clazz.simpleName}] -> $logMessage")
@@ -1768,6 +1767,24 @@ class SteamService : Service(), IChallengeUrlChanged {
                         Timber.i("maxDownloads: $maxDownloads")
                         Timber.i("maxDecompress: $maxDecompress")
 
+                        // Register a log listener to capture JavaSteam internal logs
+                        val logListener = object : `in`.dragonbra.javasteam.util.log.LogListener {
+                            override fun onLog(clazz: Class<*>, message: String?, throwable: Throwable?) {
+                                val prefix = clazz.simpleName
+                                message?.let { DownloadLogger.append(appId, "[$prefix] $it") }
+                                throwable?.let { DownloadLogger.append(appId, "[$prefix] ${it.message ?: it.javaClass.simpleName}") }
+                            }
+                            override fun onError(clazz: Class<*>, message: String?, throwable: Throwable?) {
+                                val prefix = clazz.simpleName
+                                message?.let { DownloadLogger.append(appId, "[$prefix] ERROR: $it") }
+                                throwable?.let { DownloadLogger.append(appId, "[$prefix] ERROR: ${it.message ?: it.javaClass.simpleName}") }
+                            }
+                        }
+                        `in`.dragonbra.javasteam.util.log.LogManager.addListener(logListener)
+
+                        // Clear previous download log for this game
+                        DownloadLogger.clear(appId)
+
                         // Create DepotDownloader instance
                         val depotDownloader = DepotDownloader(
                             instance!!.steamClient!!,
@@ -1783,7 +1800,7 @@ class SteamService : Service(), IChallengeUrlChanged {
 
                         // Create listeners for DLC apps
                         val depotIdToIndex = selectedDepots.keys.mapIndexed { index, depotId -> depotId to index }.toMap()
-                        val listener = AppDownloadListener(di, depotIdToIndex)
+                        val listener = AppDownloadListener(di, depotIdToIndex, logListener)
                         depotDownloader.addListener(listener)
 
                         val branchPassword = instance?.steamUnlockedBranchDao
@@ -2134,6 +2151,7 @@ class SteamService : Service(), IChallengeUrlChanged {
         private class AppDownloadListener(
             private val downloadInfo: DownloadInfo,
             private val depotIdToIndex: Map<Int, Int>,
+            private val logListener: `in`.dragonbra.javasteam.util.log.LogListener,
         ) : IDownloadListener {
             // Track cumulative uncompressed bytes per depot to calculate deltas
             // (uncompressedBytes from onChunkCompleted is cumulative per depot)
@@ -2144,22 +2162,32 @@ class SteamService : Service(), IChallengeUrlChanged {
 
             override fun onDownloadStarted(item: DownloadItem) {
                 Timber.i("Item ${item.appId} download started")
+                DownloadLogger.append(downloadInfo.gameId, "Download started for app ${item.appId}")
             }
 
             override fun onDownloadCompleted(item: DownloadItem) {
                 Timber.i("Item ${item.appId} download completed")
+                DownloadLogger.append(downloadInfo.gameId, "Download completed")
+                DownloadLogger.flush(downloadInfo.gameId)
+                `in`.dragonbra.javasteam.util.log.LogManager.removeListener(logListener)
             }
 
             override fun onDownloadFailed(item: DownloadItem, error: Throwable) {
                 Timber.e(error, "Item ${item.appId} failed to download")
+                DownloadLogger.append(downloadInfo.gameId, "FAILED: ${error.message ?: error.javaClass.simpleName}")
+                DownloadLogger.flush(downloadInfo.gameId)
                 downloadInfo.failedToDownload()
 
-                // Remove the downloading app info
+                // Clean up log listener
+                `in`.dragonbra.javasteam.util.log.LogManager.removeListener(logListener)
+
+                // Remove the downloading app info from DB
                 runBlocking {
                     instance?.downloadingAppInfoDao?.deleteApp(downloadInfo.gameId)
                 }
 
-                removeDownloadJob(downloadInfo.gameId)
+                // Notify UI (log persists via DownloadLogger)
+                notifyDownloadStopped(downloadInfo.gameId)
                 instance?.let { service ->
                     SnackbarManager.show(service.getString(R.string.download_failed_try_again))
                 }
@@ -2167,7 +2195,7 @@ class SteamService : Service(), IChallengeUrlChanged {
 
             override fun onStatusUpdate(message: String) {
                 Timber.d("Download status: $message")
-                downloadInfo.updateStatusMessage(message)
+                DownloadLogger.append(downloadInfo.gameId, message)
             }
 
             override fun onChunkCompleted(
@@ -3277,7 +3305,7 @@ class SteamService : Service(), IChallengeUrlChanged {
         connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
 
         // To view log messages in android logcat properly
-        LogManager.addListener(logger)
+        `in`.dragonbra.javasteam.util.log.LogManager.addListener(logger)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -3477,7 +3505,7 @@ class SteamService : Service(), IChallengeUrlChanged {
         PluviaApp.events.off<AndroidEvent.EndProcess, Unit>(onEndProcess)
         PluviaApp.events.clearAllListenersOf<SteamEvent<Any>>()
 
-        LogManager.removeListener(logger)
+        `in`.dragonbra.javasteam.util.log.LogManager.removeListener(logger)
     }
 
     private fun reconnect() {
