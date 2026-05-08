@@ -1768,22 +1768,33 @@ class SteamService : Service(), IChallengeUrlChanged {
                         Timber.i("maxDecompress: $maxDecompress")
 
                         // Register a log listener to capture JavaSteam internal logs
+                        val logListenerActive = java.util.concurrent.atomic.AtomicBoolean(true)
                         val logListener = object : `in`.dragonbra.javasteam.util.log.LogListener {
                             override fun onLog(clazz: Class<*>, message: String?, throwable: Throwable?) {
+                                if (!logListenerActive.get()) return
                                 val prefix = clazz.simpleName
                                 message?.let { DownloadLogger.append(appId, "[$prefix] $it") }
                                 throwable?.let { DownloadLogger.append(appId, "[$prefix] ${it.message ?: it.javaClass.simpleName}") }
                             }
                             override fun onError(clazz: Class<*>, message: String?, throwable: Throwable?) {
+                                if (!logListenerActive.get()) return
                                 val prefix = clazz.simpleName
                                 message?.let { DownloadLogger.append(appId, "[$prefix] ERROR: $it") }
                                 throwable?.let { DownloadLogger.append(appId, "[$prefix] ERROR: ${it.message ?: it.javaClass.simpleName}") }
                             }
                         }
+
+                        // Clear previous download log BEFORE registering listener (avoid race)
+                        DownloadLogger.clear(appId)
+
                         `in`.dragonbra.javasteam.util.log.LogManager.addListener(logListener)
 
-                        // Clear previous download log for this game
-                        DownloadLogger.clear(appId)
+                        // Guaranteed cleanup: remove listener when the download coroutine completes
+                        val downloadCleanup = {
+                            logListenerActive.set(false)
+                            `in`.dragonbra.javasteam.util.log.LogManager.removeListener(logListener)
+                        }
+                        coroutineContext[Job]?.invokeOnCompletion { downloadCleanup() }
 
                         // Create DepotDownloader instance
                         val depotDownloader = DepotDownloader(
@@ -1800,7 +1811,7 @@ class SteamService : Service(), IChallengeUrlChanged {
 
                         // Create listeners for DLC apps
                         val depotIdToIndex = selectedDepots.keys.mapIndexed { index, depotId -> depotId to index }.toMap()
-                        val listener = AppDownloadListener(di, depotIdToIndex, logListener)
+                        val listener = AppDownloadListener(di, depotIdToIndex)
                         depotDownloader.addListener(listener)
 
                         val branchPassword = instance?.steamUnlockedBranchDao
@@ -2151,7 +2162,6 @@ class SteamService : Service(), IChallengeUrlChanged {
         private class AppDownloadListener(
             private val downloadInfo: DownloadInfo,
             private val depotIdToIndex: Map<Int, Int>,
-            private val logListener: `in`.dragonbra.javasteam.util.log.LogListener,
         ) : IDownloadListener {
             // Track cumulative uncompressed bytes per depot to calculate deltas
             // (uncompressedBytes from onChunkCompleted is cumulative per depot)
@@ -2169,7 +2179,6 @@ class SteamService : Service(), IChallengeUrlChanged {
                 Timber.i("Item ${item.appId} download completed")
                 DownloadLogger.append(downloadInfo.gameId, "Download completed")
                 DownloadLogger.flush(downloadInfo.gameId)
-                `in`.dragonbra.javasteam.util.log.LogManager.removeListener(logListener)
             }
 
             override fun onDownloadFailed(item: DownloadItem, error: Throwable) {
@@ -2178,16 +2187,11 @@ class SteamService : Service(), IChallengeUrlChanged {
                 DownloadLogger.flush(downloadInfo.gameId)
                 downloadInfo.failedToDownload()
 
-                // Clean up log listener
-                `in`.dragonbra.javasteam.util.log.LogManager.removeListener(logListener)
-
                 // Remove the downloading app info from DB
                 runBlocking {
                     instance?.downloadingAppInfoDao?.deleteApp(downloadInfo.gameId)
                 }
 
-                // Notify UI (log persists via DownloadLogger)
-                notifyDownloadStopped(downloadInfo.gameId)
                 instance?.let { service ->
                     SnackbarManager.show(service.getString(R.string.download_failed_try_again))
                 }
