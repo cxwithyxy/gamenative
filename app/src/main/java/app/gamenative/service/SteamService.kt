@@ -1783,6 +1783,10 @@ class SteamService : Service(), IChallengeUrlChanged {
                                 throwable?.let { DownloadLogger.append(appId, "[$prefix] ERROR: ${it.message ?: it.javaClass.simpleName}") }
                             }
                         }
+
+                        // Clear previous download log BEFORE registering listener (avoid race)
+                        DownloadLogger.clear(appId)
+
                         `in`.dragonbra.javasteam.util.log.LogManager.addListener(logListener)
 
                         // Guaranteed cleanup: remove listener when the download coroutine completes
@@ -1791,9 +1795,6 @@ class SteamService : Service(), IChallengeUrlChanged {
                             `in`.dragonbra.javasteam.util.log.LogManager.removeListener(logListener)
                         }
                         coroutineContext[Job]?.invokeOnCompletion { downloadCleanup() }
-
-                        // Clear previous download log for this game
-                        DownloadLogger.clear(appId)
 
                         // Create DepotDownloader instance
                         val depotDownloader = DepotDownloader(
