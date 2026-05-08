@@ -2192,8 +2192,6 @@ class SteamService : Service(), IChallengeUrlChanged {
                     instance?.downloadingAppInfoDao?.deleteApp(downloadInfo.gameId)
                 }
 
-                // Notify UI (log persists via DownloadLogger)
-                notifyDownloadStopped(downloadInfo.gameId)
                 instance?.let { service ->
                     SnackbarManager.show(service.getString(R.string.download_failed_try_again))
                 }
