@@ -406,7 +406,7 @@ fun XServerScreen(
         }
     }
     var isKeyboardVisible = false
-    var areControlsVisible by remember { mutableStateOf(false) }
+    var areControlsVisible by remember(container.id) { mutableStateOf(container.isInputControlsVisible) }
     var isDisableMouseInput by remember(container.id) { mutableStateOf(container.isDisableMouseInput) }
     var isEditMode by remember { mutableStateOf(false) }
     var gameRoot by remember { mutableStateOf<View?>(null) }
@@ -995,6 +995,8 @@ fun XServerScreen(
                     }
                 }
                 areControlsVisible = !areControlsVisible
+                container.setInputControlsVisible(areControlsVisible)
+                container.saveData()
                 true
             }
 
@@ -1105,6 +1107,8 @@ fun XServerScreen(
                     if (areControlsVisible) {
                         hideInputControls()
                         areControlsVisible = false
+                        container.setInputControlsVisible(false)
+                        container.saveData()
                     }
 
                     // Hide cursor in touchscreen mode

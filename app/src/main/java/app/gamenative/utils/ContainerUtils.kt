@@ -250,6 +250,8 @@ object ContainerUtils {
         val disableMouse = container.isDisableMouseInput()
         // Read touchscreen-mode flag from container
         val touchscreenMode = container.isTouchscreenMode()
+        // Read input-controls-visibility flag from container
+        val inputControlsVisible = container.isInputControlsVisible()
         // Read shooter-mode flag from container
         val shooterMode = container.isShooterMode()
         // Read gesture configuration JSON
@@ -304,6 +306,7 @@ object ContainerUtils {
             dinputMapperType = mapperType,
             disableMouseInput = disableMouse,
             touchscreenMode = touchscreenMode,
+            inputControlsVisible = inputControlsVisible,
             shooterMode = shooterMode,
             gestureConfig = gestureConfig,
             externalDisplayMode = externalDisplayMode,
@@ -469,6 +472,7 @@ object ContainerUtils {
         container.setFEXCorePreset(containerData.fexcorePreset)
         container.setDisableMouseInput(containerData.disableMouseInput)
         container.setTouchscreenMode(containerData.touchscreenMode)
+        container.setInputControlsVisible(containerData.inputControlsVisible)
         container.setShooterMode(containerData.shooterMode)
         container.setGestureConfig(containerData.gestureConfig)
         container.setExternalDisplayMode(containerData.externalDisplayMode)

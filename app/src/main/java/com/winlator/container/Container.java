@@ -126,6 +126,8 @@ public class Container {
     private boolean disableMouseInput = false;
     // Touchscreen mode
     private boolean touchscreenMode = false;
+    // Input controls overlay visible
+    private boolean inputControlsVisible = false;
     // Shooter mode
     private boolean shooterMode = true;
     // Serialised JSON gesture configuration (used when touchscreenMode is true)
@@ -678,6 +680,8 @@ public class Container {
             data.put("disableMouseInput", disableMouseInput);
             // Touchscreen mode flag
             data.put("touchscreenMode", touchscreenMode);
+            // Input controls visibility flag
+            data.put("inputControlsVisible", inputControlsVisible);
             // Shooter mode flag
             data.put("shooterMode", shooterMode);
             // Gesture configuration JSON
@@ -868,6 +872,9 @@ public class Container {
                     break;
                 case "touchscreenMode" :
                     setTouchscreenMode(data.getBoolean(key));
+                    break;
+                case "inputControlsVisible" :
+                    setInputControlsVisible(data.getBoolean(key));
                     break;
                 case "shooterMode" :
                     setShooterMode(data.getBoolean(key));
@@ -1075,6 +1082,14 @@ public class Container {
 
     public void setTouchscreenMode(boolean touchscreenMode) {
         this.touchscreenMode = touchscreenMode;
+    }
+
+    public boolean isInputControlsVisible() {
+        return inputControlsVisible;
+    }
+
+    public void setInputControlsVisible(boolean inputControlsVisible) {
+        this.inputControlsVisible = inputControlsVisible;
     }
 
     // Shooter mode
