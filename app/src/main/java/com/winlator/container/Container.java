@@ -127,7 +127,7 @@ public class Container {
     // Touchscreen mode
     private boolean touchscreenMode = false;
     // Input controls overlay visible
-    private boolean inputControlsVisible = false;
+    private boolean inputControlsVisible = true;
     // Shooter mode
     private boolean shooterMode = true;
     // Serialised JSON gesture configuration (used when touchscreenMode is true)

@@ -844,10 +844,11 @@ fun XServerScreen(
                 } ?: manager?.getProfile(0) ?: profiles.getOrNull(2) ?: profiles.first()
 
                 if (!showElementEditor && !keepPausedForEditor && !showQuickMenu && !isEditMode) {
-                    Timber.d("No external devices attached, showing on-screen controls")
-                    if (!areControlsVisible) {
+                    // Respect persisted input controls preference: only auto-show when
+                    // the container explicitly has input controls enabled (default is false).
+                    if (areControlsVisible) {
+                        Timber.d("Restoring persisted on-screen controls")
                         showInputControls(targetProfile, xServerView!!.getxServer().winHandler, container)
-                        areControlsVisible = true
                     }
 
                     PluviaApp.touchpadView?.postDelayed({
