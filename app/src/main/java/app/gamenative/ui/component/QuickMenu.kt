@@ -1934,39 +1934,7 @@ private fun QuickMenuItemRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .then(
-                if (isFocused && isEnabled) {
-                    Modifier.border(
-                        BorderStroke(
-                            2.dp,
-                            Brush.verticalGradient(
-                                colors = listOf(
-                                    MaterialTheme.colorScheme.primary,
-                                    MaterialTheme.colorScheme.tertiary,
-                                ),
-                            ),
-                        ),
-                        shape,
-                    )
-                } else {
-                    Modifier
-                }
-            )
             .clip(shape)
-            .then(
-                if (isFocused && isEnabled) {
-                    Modifier.background(
-                        brush = Brush.horizontalGradient(
-                            colors = listOf(
-                                accentColor.copy(alpha = 0.15f),
-                                accentColor.copy(alpha = 0.05f),
-                            ),
-                        ),
-                    )
-                } else {
-                    Modifier
-                }
-            )
             .then(
                 if (focusRequester != null) {
                     Modifier.focusRequester(focusRequester)
@@ -2001,7 +1969,8 @@ private fun QuickMenuItemRow(
                 .background(
                     when {
                         !isEnabled -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                        isFocused || isActive -> accentColor.copy(alpha = 0.2f)
+                        isActive -> accentColor.copy(alpha = 0.2f)
+                        isFocused -> accentColor.copy(alpha = 0.08f)
                         else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                     },
                 ),
@@ -2012,7 +1981,7 @@ private fun QuickMenuItemRow(
                 contentDescription = null,
                 tint = when {
                     !isEnabled -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = disabledAlpha)
-                    isFocused || isActive -> accentColor
+                    isActive -> accentColor
                     else -> MaterialTheme.colorScheme.onSurfaceVariant
                 },
                 modifier = Modifier.size(22.dp),
@@ -2024,7 +1993,6 @@ private fun QuickMenuItemRow(
             style = MaterialTheme.typography.bodyLarge,
             color = when {
                 !isEnabled -> MaterialTheme.colorScheme.onSurface.copy(alpha = disabledAlpha)
-                isFocused -> accentColor
                 else -> MaterialTheme.colorScheme.onSurface
             },
             modifier = Modifier.weight(1f),
