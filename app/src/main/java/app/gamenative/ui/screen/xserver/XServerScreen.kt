@@ -2053,6 +2053,13 @@ fun XServerScreen(
             } else {
                 frameLayout.addView(icView)
             }
+
+            // Hide controls initially if persisted state says off;
+            // showInputControls will re-enable when needed by auto-detect below.
+            if (!areControlsVisible) {
+                hideInputControls()
+            }
+
             val configuredExternalMode = ExternalDisplayInputController.fromConfig(container.externalDisplayMode)
             val swapEnabled = container.isExternalDisplaySwap
 
