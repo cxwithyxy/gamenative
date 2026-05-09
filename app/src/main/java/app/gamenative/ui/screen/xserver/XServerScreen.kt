@@ -2145,21 +2145,20 @@ fun XServerScreen(
                         // 2. Else if physical controller detected → hide
                         // 3. Else if physical mouse/keyboard detected → hide
                         // 4. Else → show
-                        val shouldShowControls = when {
-                            container.isTouchscreenMode -> false
-                            hasPhysicalController -> false
-                            hasPhysicalKeyboard || hasPhysicalMouse -> false
-                            else -> true
+                        val shouldHideControls = when {
+                            container.isTouchscreenMode -> true
+                            hasPhysicalController -> true
+                            hasPhysicalKeyboard || hasPhysicalMouse -> true
+                            else -> false
                         }
 
-                        if (shouldShowControls) {
-                            Timber.d("Auto-showing onscreen controls")
-                            showInputControls(profile, xServerView.getxServer().winHandler, container)
-                            areControlsVisible = true
-                        } else {
-                            Timber.d("Hiding onscreen controls")
+                        if (shouldHideControls) {
+                            Timber.d("External device detected, hiding onscreen controls")
                             hideInputControls()
                             areControlsVisible = false
+                        } else if (areControlsVisible) {
+                            Timber.d("Restoring persisted onscreen controls")
+                            showInputControls(profile, xServerView.getxServer().winHandler, container)
                         }
                     } else {
                         Timber.w("Profile has no elements - cannot auto-show controls")
