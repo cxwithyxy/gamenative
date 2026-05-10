@@ -913,6 +913,8 @@
     <string name="settings_info_privacy_subtitle">Opens a link to GameNative\'s privacy policy</string>
     <string name="settings_info_usage_analytics_title">Usage analytics</string>
     <string name="settings_info_usage_analytics_subtitle">We never track personal information. Disabling this stops non-essential analytics, however core game performance data is still collected as a legitimate interest to improve compatibility.</string>
+    <string name="settings_info_update_check_title">Automatically check for updates</string>
+    <string name="settings_info_update_check_subtitle">Check for new versions when the app starts</string>
 
     <!-- Settings: Interface Group -->
     <string name="settings_interface_title">Interface</string>

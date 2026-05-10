@@ -1217,4 +1217,9 @@ object PrefManager {
     var usageAnalyticsEnabled: Boolean
         get() = getPref(USAGE_ANALYTICS_ENABLED, true)
         set(value) { setPref(USAGE_ANALYTICS_ENABLED, value) }
+
+    private val UPDATE_CHECK_ENABLED = booleanPreferencesKey("update_check_enabled")
+    var updateCheckEnabled: Boolean
+        get() = getPref(UPDATE_CHECK_ENABLED, true)
+        set(value) { setPref(UPDATE_CHECK_ENABLED, value) }
 }

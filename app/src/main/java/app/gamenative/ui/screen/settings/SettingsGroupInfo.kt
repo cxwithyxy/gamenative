@@ -90,5 +90,17 @@ fun SettingsGroupInfo() {
                 PrefManager.usageAnalyticsEnabled = it
             },
         )
+
+        var updateCheckEnabled by rememberSaveable { mutableStateOf(PrefManager.updateCheckEnabled) }
+        SettingsSwitch(
+            colors = settingsTileColorsAlt(),
+            state = updateCheckEnabled,
+            title = { Text(stringResource(R.string.settings_info_update_check_title)) },
+            subtitle = { Text(text = stringResource(R.string.settings_info_update_check_subtitle)) },
+            onCheckedChange = {
+                updateCheckEnabled = it
+                PrefManager.updateCheckEnabled = it
+            },
+        )
     }
 }
