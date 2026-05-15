@@ -1091,7 +1091,10 @@
 
     <string name="main_installing_glibc">Installing glibc components...</string>
     <string name="main_installing_bionic">Installing Bionic components...</string>
+    <string name="main_preparing_container">Preparing container…</string>
+    <string name="main_verifying_executable">Verifying game executable…</string>
     <string name="main_loading">Loading...</string>
+    <string name="main_activating_container">Activating container…</string>
     <string name="download_failed_title">Download Failed</string>
     <string name="download_failed_message">A required file could not be downloaded. Please check your network connection and try again.</string>
     <string name="install_failed_title">Installation Failed</string>

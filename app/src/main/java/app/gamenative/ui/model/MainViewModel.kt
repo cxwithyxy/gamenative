@@ -587,15 +587,32 @@ class MainViewModel @Inject constructor(
 
         if (gameSource == GameSource.STEAM) {
             try {
+                setLoadingDialogMessage("Syncing cloud saves")
+                setLoadingDialogProgress(-1f)
+                setLoadingDialogVisible(true)
+
                 val container = withContext(Dispatchers.IO) {
                     ContainerUtils.getContainer(context, appId)
                 }
-                SteamService.closeApp(context, gameId, isOffline.value) { prefix ->
-                    PathType.from(prefix).toAbsPath(container, gameId, SteamService.userSteamId!!.accountID)
-                }.await()
+                SteamService.closeApp(
+                    context = context,
+                    appId = gameId,
+                    isOffline = isOffline.value,
+                    prefixToPath = { prefix ->
+                        PathType.from(prefix).toAbsPath(container, gameId, SteamService.userSteamId!!.accountID)
+                    },
+                    onProgress = { message, progress ->
+                        setLoadingDialogMessage(message)
+                        setLoadingDialogProgress(if (progress < 0) -1f else progress)
+                    },
+                ).await()
+
+                setLoadingDialogVisible(false)
             } catch (e: CancellationException) {
+                setLoadingDialogVisible(false)
                 throw e
             } catch (t: Throwable) {
+                setLoadingDialogVisible(false)
                 Timber.tag("Steam").e(t, "[Cloud Saves] Exception during close app sync for $gameId")
             }
         }
