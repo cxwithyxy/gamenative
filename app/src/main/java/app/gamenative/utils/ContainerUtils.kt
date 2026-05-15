@@ -103,6 +103,7 @@ object ContainerUtils {
             execArgs = PrefManager.execArgs,
             showFPS = false,
             launchRealSteam = PrefManager.launchRealSteam,
+            launchBionicSteam = PrefManager.launchBionicSteam,
             cpuList = PrefManager.cpuList,
             cpuListWoW64 = PrefManager.cpuListWoW64,
             wow64Mode = PrefManager.wow64Mode,
@@ -162,6 +163,7 @@ object ContainerUtils {
         PrefManager.drives = containerData.drives
         PrefManager.execArgs = containerData.execArgs
         PrefManager.launchRealSteam = containerData.launchRealSteam
+        PrefManager.launchBionicSteam = containerData.launchBionicSteam
         PrefManager.cpuList = containerData.cpuList
         PrefManager.cpuListWoW64 = containerData.cpuListWoW64
         PrefManager.wow64Mode = containerData.wow64Mode
@@ -277,6 +279,7 @@ object ContainerUtils {
             executablePath = container.executablePath,
             showFPS = false,
             launchRealSteam = container.isLaunchRealSteam,
+            launchBionicSteam = container.isLaunchBionicSteam,
             allowSteamUpdates = container.isAllowSteamUpdates,
             steamType = container.getSteamType(),
             cpuList = container.cpuList,
@@ -453,6 +456,7 @@ object ContainerUtils {
         container.executablePath = containerData.executablePath
         container.isShowFPS = false
         container.isLaunchRealSteam = containerData.launchRealSteam
+        container.isLaunchBionicSteam = containerData.launchBionicSteam
         container.isAllowSteamUpdates = containerData.allowSteamUpdates
         container.setSteamType(containerData.steamType)
         container.cpuList = containerData.cpuList
@@ -827,6 +831,7 @@ object ContainerUtils {
                 execArgs = PrefManager.execArgs,
                 showFPS = false,
                 launchRealSteam = PrefManager.launchRealSteam,
+                launchBionicSteam = PrefManager.launchBionicSteam,
                 wow64Mode = PrefManager.wow64Mode,
                 startupSelection = PrefManager.startupSelection.toByte(),
                 box86Version = PrefManager.box86Version,

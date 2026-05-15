@@ -85,6 +85,7 @@ public class Container {
     private String wineVersion = WineInfo.MAIN_WINE_VERSION.identifier();
     private boolean showFPS;
     private boolean launchRealSteam;
+    private boolean launchBionicSteam;
     private boolean allowSteamUpdates;
     private boolean wow64Mode = true;
     private boolean needsUnpacking = true;
@@ -325,6 +326,14 @@ public class Container {
 
     public void setLaunchRealSteam(boolean launchRealSteam) {
         this.launchRealSteam = launchRealSteam;
+    }
+
+    public boolean isLaunchBionicSteam() {
+        return launchBionicSteam;
+    }
+
+    public void setLaunchBionicSteam(boolean launchBionicSteam) {
+        this.launchBionicSteam = launchBionicSteam;
     }
 
     public boolean isAllowSteamUpdates() {
@@ -654,6 +663,7 @@ public class Container {
             data.put("drives", drives);
             data.put("showFPS", showFPS);
             data.put("launchRealSteam", launchRealSteam);
+            data.put("launchBionicSteam", launchBionicSteam);
             data.put("allowSteamUpdates", allowSteamUpdates);
             data.put("inputType", inputType);
             data.put("dinputMapperType", dinputMapperType);
@@ -774,6 +784,9 @@ public class Container {
                     break;
                 case "launchRealSteam" :
                     setLaunchRealSteam(data.getBoolean(key));
+                    break;
+                case "launchBionicSteam" :
+                    setLaunchBionicSteam(data.getBoolean(key));
                     break;
                 case "allowSteamUpdates" :
                     setAllowSteamUpdates(data.getBoolean(key));
