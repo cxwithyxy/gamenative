@@ -1559,6 +1559,7 @@ fun preLaunchApp(
 
         // Migrate legacy on-disk imagefs layout (e.g. legacy Proton → shared paths) before manifest
         // installs or launch deps — resolveMissingManifestInstallRequests can install Proton too.
+        setLoadingMessage(context.getString(R.string.main_preparing_container))
         val legacyImageFsRoot = File(context.filesDir, "imagefs")
         val migrationOk = ImageFSLegacyMigrator.migrateLegacyDirsIfNeeded(
             context,
@@ -1585,6 +1586,7 @@ fun preLaunchApp(
         // When "Open container" is used we boot to desktop/file manager only — skip executable check
         if (!bootToContainer) {
             // Verify we have a launch executable for all platforms before proceeding (fail fast, avoid black screen)
+            setLoadingMessage(context.getString(R.string.main_verifying_executable))
             val effectiveExe = when (gameSource) {
                 GameSource.STEAM -> SteamService.getLaunchExecutable(appId, container)
                 GameSource.GOG -> GOGService.getLaunchExecutable(appId, container)
@@ -1754,7 +1756,7 @@ fun preLaunchApp(
             return@launch
         }
 
-        setLoadingMessage(context.getString(R.string.main_loading))
+        setLoadingMessage(context.getString(R.string.main_activating_container))
         setLoadingProgress(-1f)
 
         // must activate container before downloading save files
