@@ -1387,11 +1387,21 @@ fun XServerScreen(
         }
         val onForceCloseApp: (SteamEvent.ForceCloseApp) -> Unit = {
             Timber.i("onForceCloseApp")
-            exit(xServerView!!.getxServer().winHandler, frameRating, currentAppInfo, container, appId, onExit, navigateBack)
+            if (container.isSteamOfflineMode) {
+                Timber.i("Suppressing ForceCloseApp in offline mode")
+                SteamService.clearPlayingConflict()
+            } else {
+                exit(xServerView!!.getxServer().winHandler, frameRating, currentAppInfo, container, appId, onExit, navigateBack)
+            }
         }
         val onPlayingBlocked: (SteamEvent.PlayingBlocked) -> Unit = {
             Timber.i("onPlayingBlocked")
-            showPlayingBlockedDialog = true
+            if (container.isSteamOfflineMode) {
+                Timber.i("Suppressing PlayingBlocked dialog in offline mode")
+                SteamService.clearPlayingConflict()
+            } else {
+                showPlayingBlockedDialog = true
+            }
         }
         val debugCallback = Callback<String> { outputLine ->
             Timber.i(outputLine ?: "")
