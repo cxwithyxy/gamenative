@@ -1357,7 +1357,8 @@ fun PluviaMain(
                             viewModel.setLaunchedAppId(appId)
                             viewModel.setBootToContainer(asContainer)
                             viewModel.setTestGraphics(false)
-                            viewModel.setOffline(isOffline)
+                            val effectiveOffline = resolveEffectiveOffline(context, appId, isOffline)
+                            viewModel.setOffline(effectiveOffline)
                             preLaunchApp(
                                 context = context,
                                 appId = appId,
@@ -1366,7 +1367,7 @@ fun PluviaMain(
                                 setLoadingMessage = viewModel::setLoadingDialogMessage,
                                 setMessageDialogState = { msgDialogState = it },
                                 onSuccess = viewModel::launchApp,
-                                isOffline = isOffline,
+                                isOffline = effectiveOffline,
                                 bootToContainer = asContainer,
                             )
                         },
@@ -1374,7 +1375,8 @@ fun PluviaMain(
                             viewModel.setLaunchedAppId(appId)
                             viewModel.setBootToContainer(true)
                             viewModel.setTestGraphics(true)
-                            viewModel.setOffline(isOffline)
+                            val effectiveOffline = resolveEffectiveOffline(context, appId, isOffline)
+                            viewModel.setOffline(effectiveOffline)
                             preLaunchApp(
                                 context = context,
                                 appId = appId,
@@ -1383,7 +1385,7 @@ fun PluviaMain(
                                 setLoadingMessage = viewModel::setLoadingDialogMessage,
                                 setMessageDialogState = { msgDialogState = it },
                                 onSuccess = viewModel::launchApp,
-                                isOffline = isOffline,
+                                isOffline = effectiveOffline,
                                 bootToContainer = true,
                             )
                         },
@@ -1517,6 +1519,18 @@ fun PluviaMain(
             AchievementOverlay()
         }
     }
+}
+
+/**
+ * Resolves the effective offline state for game launch.
+ * When the container has Steam offline mode enabled, the game should
+ * skip cross-session checks and cloud sync — even if Java-side Steam
+ * is still connected.
+ */
+private fun resolveEffectiveOffline(context: Context, appId: String, navOffline: Boolean): Boolean {
+    if (navOffline) return true
+    val container = ContainerUtils.getContainer(context, appId)
+    return container?.isSteamOfflineMode() ?: false
 }
 
 fun preLaunchApp(
