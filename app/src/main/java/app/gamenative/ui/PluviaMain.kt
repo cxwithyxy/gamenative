@@ -359,8 +359,9 @@ fun PluviaMain(
                     !SteamUtils.awaitSteamLogin()
                 }
             }
+            val effectiveOffline = resolveEffectiveOffline(context, resolvedAppId, isOffline)
             // sync viewModel — dialog retries + replaceSteamApi read isOffline.value
-            viewModel.setOffline(isOffline)
+            viewModel.setOffline(effectiveOffline)
             preLaunchApp(
                 context = context,
                 appId = resolvedAppId,
@@ -370,7 +371,7 @@ fun PluviaMain(
                 setLoadingMessage = viewModel::setLoadingDialogMessage,
                 setMessageDialogState = setMessageDialogState,
                 onSuccess = viewModel::launchApp,
-                isOffline = isOffline,
+                isOffline = effectiveOffline,
             )
         }
     }
@@ -922,6 +923,7 @@ fun PluviaMain(
                     setLoadingMessage = viewModel::setLoadingDialogMessage,
                     setMessageDialogState = setMessageDialogState,
                     onSuccess = viewModel::launchApp,
+                    isOffline = viewModel.isOffline.value,
                 )
             }
             onDismissClick = {
@@ -1529,8 +1531,14 @@ fun PluviaMain(
  */
 private fun resolveEffectiveOffline(context: Context, appId: String, navOffline: Boolean): Boolean {
     if (navOffline) return true
-    val container = ContainerUtils.getContainer(context, appId)
-    return container?.isSteamOfflineMode() ?: false
+    val containerManager = com.winlator.container.ContainerManager(context)
+    if (!containerManager.hasContainer(appId)) return false
+    val container = containerManager.getContainerById(appId) ?: return false
+    val result = container.isSteamOfflineMode
+    if (result) {
+        Timber.i("resolveEffectiveOffline: container offline mode active for $appId")
+    }
+    return result
 }
 
 fun preLaunchApp(
