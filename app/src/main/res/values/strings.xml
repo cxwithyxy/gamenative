@@ -1499,4 +1499,12 @@
     <string name="lsfg_performance_mode_desc">Reduces quality for higher throughput</string>
     <string name="settings_interface_show_recommendations_title">Show game recommendations</string>
     <string name="settings_interface_show_recommendations_subtitle">Show curated indie game picks in your library. Keeping this on helps support indie developers and GameNative.</string>
+    <string name="settings_network_title">Network</string>
+    <string name="settings_network_dns_enable_title">Custom DNS</string>
+    <string name="settings_network_dns_enable_subtitle">When enabled, DNS queries use the configured servers instead of the system default</string>
+    <string name="settings_network_dns_servers_title">DNS Servers</string>
+    <string name="settings_network_dns_servers_empty">Not configured</string>
+    <string name="settings_network_dns_servers_dialog_title">DNS Servers</string>
+    <string name="settings_network_dns_servers_dialog_hint">Enter one DNS server address per line, or separate with commas</string>
+    <string name="settings_network_dns_servers_placeholder">e.g.\n8.8.8.8\n1.1.1.1</string>
 </resources>

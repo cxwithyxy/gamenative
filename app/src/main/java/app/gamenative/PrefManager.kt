@@ -1237,4 +1237,15 @@ object PrefManager {
     var updateCheckEnabled: Boolean
         get() = getPref(UPDATE_CHECK_ENABLED, true)
         set(value) { setPref(UPDATE_CHECK_ENABLED, value) }
+
+    /* DNS Settings */
+    private val DNS_ENABLED = booleanPreferencesKey("dns_enabled")
+    var dnsEnabled: Boolean
+        get() = getPref(DNS_ENABLED, false)
+        set(value) { setPref(DNS_ENABLED, value) }
+
+    private val DNS_SERVERS = stringPreferencesKey("dns_servers")
+    var dnsServers: String
+        get() = getPref(DNS_SERVERS, "")
+        set(value) { setPref(DNS_SERVERS, value) }
 }

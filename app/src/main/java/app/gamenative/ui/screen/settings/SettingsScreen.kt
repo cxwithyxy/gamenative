@@ -28,6 +28,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.BugReport
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Gamepad
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Palette
@@ -128,6 +129,15 @@ private fun SettingsScreenContent(
                     iconTint = PluviaTheme.colors.accentCyan,
                 ) {
                     SettingsGroupEmulation()
+                }
+
+                // Network section
+                SettingsSection(
+                    title = stringResource(R.string.settings_network_title),
+                    icon = Icons.Default.Build,
+                    iconTint = PluviaTheme.colors.accentCyan,
+                ) {
+                    SettingsGroupNetwork()
                 }
 
                 // Interface section

@@ -1507,4 +1507,12 @@
     <string name="lsfg_install_message">將從 Steam 下載 Lossless Scaling 以啟用幀生成。</string>
     <string name="lsfg_installing">正在下載 Lossless Scaling…</string>
     <string name="lsfg_performance_mode_desc">降低畫質以提升吞吐量</string>
+    <string name="settings_network_title">網路</string>
+    <string name="settings_network_dns_enable_title">自訂 DNS</string>
+    <string name="settings_network_dns_enable_subtitle">開啟後，DNS 查詢將使用指定的伺服器，而非系統預設 DNS</string>
+    <string name="settings_network_dns_servers_title">DNS 伺服器</string>
+    <string name="settings_network_dns_servers_empty">未設定</string>
+    <string name="settings_network_dns_servers_dialog_title">DNS 伺服器</string>
+    <string name="settings_network_dns_servers_dialog_hint">每行輸入一個 DNS 伺服器位址，也可用逗號分隔</string>
+    <string name="settings_network_dns_servers_placeholder">例如\n8.8.8.8\n1.1.1.1</string>
 </resources>
